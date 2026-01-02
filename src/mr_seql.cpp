@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <limits>
 
 void read_multi_data(string path, vector<vector<string>> &sequences,vector<double> &labels){
 	ifstream in(path);
