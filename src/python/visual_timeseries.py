@@ -49,7 +49,7 @@ def plot_thickness(ts,metats):
 		# plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=[max(0,(color - 0.5) * 2),1 - 2*abs(0.5-color),max(0,(0.5 - color)*2)])
 		plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=[color,0,max(0,0.8 - color)])
 
-
+classes = {0: "arabica", 1: "robusta"}
 
 def plot_time_series_with_highlight(ts_file, scores_file, ith):
 
@@ -65,22 +65,25 @@ def plot_time_series_with_highlight(ts_file, scores_file, ith):
 	metats[metats < 0] = 0
 
 	yts = np.array([float(x) for x in tss[o].strip().split(',')])
-	#y = int(yts[0])
+	y = int(yts[0])
 	ts = yts[1:] # remove label
 
 	plot_thickness(ts,metats)
+	plt.title(classes[y] + " - time series #" + str(o+1))
+	return classes[y]
 	#plt.show()
 
 
 # Example: python visual_timeseries.py ts.csv score.csv 2 -3
 # will plot 2nd and 3rd time series from ts.csv with the highlight determined by score.csv
 # the 2nd time series will be highlighted with postive score from score.csv and the 3rd time series highlighted with negative score
+
 if __name__ == "__main__":
 	if (len(sys.argv) > 3):
 		for ts in sys.argv[3:]:
 			plt.figure(figsize=(20,10))
-			plot_time_series_with_highlight(sys.argv[1] , sys.argv[2] ,int(ts))
+			label = plot_time_series_with_highlight(sys.argv[1] , sys.argv[2] ,int(ts))
 			#plt.show()
-			plt.savefig('ts_highlights-' + str(int(ts)) + '.png', bbox_inches='tight')
+			plt.savefig('ts_highlights-' + str(int(ts)) + '-' + label + '.png', bbox_inches='tight')
 	else:
 		print("Need more input parameters")
