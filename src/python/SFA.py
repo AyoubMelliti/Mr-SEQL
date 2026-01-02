@@ -10,14 +10,25 @@ from sklearn import metrics
 #from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import LogisticRegression
 
+# Add SFA_Python to the path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'SFA_Python')))
+print(sys.path)
+
 from src.timeseries.TimeSeriesLoader import uv_load
 from src.transformation.SFA import *
+
+
+# Simple logger class
+class SimpleLogger:
+	def Log(self, message):
+		print(message)
 
 
 class MySFA:
 	def __init__(self,ucr_data):
 		self.sfa = {}
-		self.train, self.test = uv_load(ucr_data) # store train data only
+		logger = SimpleLogger()
+		self.train, self.test = uv_load(ucr_data, logger=logger) # store train data only
 		#self.acscores = np.zeros((self.raw["Samples"],self.raw["Size"]))
 	
 	def lookup(self,windowLength, wordLength, symbols, sequence, val):
@@ -52,22 +63,22 @@ class MySFA:
 		config = 0
 		while windowLength < (L - 10):
 			print(windowLength)
-			#sfa = SFA("EQUI_DEPTH")
-			#sfa.fitWindowing(self.train, windowLength, wordLength, symbols, normMean, True)			
-			#for i in range(self.train["Samples"]):
-			#	sfa_set = set()
-			#	wordList = sfa.transformWindowing(self.train[i])
-			#	for word in wordList:
-			#		sfa_set.add(self.sfaToDWord(word, symbols))
-			#	sfa_str = str(config) + ' ' + str(self.train[i].label) + ' ' + ' '.join(sfa_set) + '\n'
-			#	ftrain.write(sfa_str)
-			#for i in range(self.test["Samples"]):
-			#	sfa_set = set()
-			#	wordList = sfa.transformWindowing(self.test[i])
-			#	for word in wordList:
-			#		sfa_set.add(self.sfaToDWord(word, symbols))
-			#	sfa_str = str(config) + ' ' + str(self.test[i].label) + ' ' + ' '.join(sfa_set) + '\n'
-			#	ftest.write(sfa_str)
+			sfa = SFA("EQUI_DEPTH")
+			sfa.fitWindowing(self.train, windowLength, wordLength, symbols, normMean, True)			
+			for i in range(self.train["Samples"]):
+				sfa_set = set()
+				wordList = sfa.transformWindowing(self.train[i])
+				for word in wordList:
+					sfa_set.add(self.sfaToDWord(word, symbols))
+				sfa_str = str(config) + ' ' + str(self.train[i].label) + ' ' + ' '.join(sfa_set) + '\n'
+				ftrain.write(sfa_str)
+			for i in range(self.test["Samples"]):
+				sfa_set = set()
+				wordList = sfa.transformWindowing(self.test[i])
+				for word in wordList:
+					sfa_set.add(self.sfaToDWord(word, symbols))
+				sfa_str = str(config) + ' ' + str(self.test[i].label) + ' ' + ' '.join(sfa_set) + '\n'
+				ftest.write(sfa_str)
 			config += 1
 			#windowLength = 	int(minwl + config*np.sqrt(L-10))
 			windowLength = windowLength + int(np.sqrt(L-10))
@@ -90,5 +101,11 @@ class MySFA:
 		np.savetxt(path, self.acscores, delimiter=",", fmt = "%0.5f")
 
 if __name__ == "__main__":
-	transformer = MySFA("MoteStrain")
-	transformer.toMultiSFA('motestrain.sfa.train','motestrain.sfa.test')
+	if len(sys.argv) > 1:
+		dataset = sys.argv[1]
+	else:
+		dataset = "Coffee"  # default dataset
+	
+	print(f"Using dataset: {dataset}")
+	transformer = MySFA(dataset)
+	transformer.toMultiSFA(f'sfadir/{dataset.lower()}.sfa.train', f'sfadir/{dataset.lower()}.sfa.test')
