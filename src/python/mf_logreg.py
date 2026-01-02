@@ -18,7 +18,7 @@ from sklearn.linear_model import LogisticRegression
 def sklearn_logreg(train_x, train_y, test_x, test_y):
 
 	#logreg = LogisticRegression().fit(train_x, train_y)
-	logreg = LogisticRegression(solver='newton-cg',multi_class = 'multinomial', class_weight='balanced').fit(train_x, train_y)
+	logreg = LogisticRegression(solver='newton-cg', class_weight='balanced').fit(train_x, train_y)
 	predicted = logreg.predict(test_x)
 	print("Accuracy with logreg: %10.8f" % metrics.accuracy_score(test_y, predicted))
 	#print("Confusion matrix:")
@@ -57,8 +57,8 @@ def train_and_test_from_sources(argvs):
 	train_y = [int(l) for l in open(trainy_source,"r").read().split(' ')]
 	test_y = [int(l) for l in open(testy_source,"r").read().split(' ')]
 
-	train_x = np.concatenate([pd.read_csv(sc, header=None, delim_whitespace = True) for sc in trainx_sources],axis=1)
-	test_x = np.concatenate([pd.read_csv(sc, header=None, delim_whitespace = True) for sc in testx_sources],axis=1)
+	train_x = np.concatenate([pd.read_csv(sc, header=None, sep='\\s+') for sc in trainx_sources],axis=1)
+	test_x = np.concatenate([pd.read_csv(sc, header=None, sep='\\s+') for sc in testx_sources],axis=1)
 
 	return train_x, train_y, test_x, test_y
 
