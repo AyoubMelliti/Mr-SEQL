@@ -1,5 +1,7 @@
 build/
 seqlvenv/
+*.pyc
+
 # Prerequisites
 *.d
 
