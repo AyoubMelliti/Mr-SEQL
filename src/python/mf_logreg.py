@@ -63,6 +63,10 @@ def train_and_test_from_sources(argvs):
 	return train_x, train_y, test_x, test_y
 
 
+def run_mf_logreg(dir_paths):
+    train_x, train_y, test_x, test_y = train_and_test_from_sources(dir_paths)
+    sklearn_logreg(train_x, train_y, test_x, test_y)
+
 if __name__ == "__main__":
 	train_x, train_y, test_x, test_y = train_and_test_from_sources(sys.argv[1:])
 	sklearn_logreg(train_x, train_y, test_x, test_y)

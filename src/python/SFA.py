@@ -50,18 +50,19 @@ class MySFA:
 				if sequence in self.sfa[key][i][j]:					
 					self.acscores[i,j:(j+windowLength)] += val
 			
-	def toMultiSFA(self,train_file,test_file):
+	def toMultiSFA(self,train_file,test_file, minwl=20, maxwl=None):
 		ftrain = open(train_file,'w')
 		ftest = open(test_file,'w')
 		normMean = True
-		wordLength = 8
+		wordLength = 6
 		symbols = 4
-		minwl = 20
 		windowLength = minwl
 		L = self.train["Size"]
 		step = np.sqrt(L - 10)
+		if maxwl is None:
+			maxwl = L - 10
 		config = 0
-		while windowLength < (L - 10):
+		while windowLength < maxwl:
 			print(windowLength)
 			sfa = SFA("EQUI_DEPTH")
 			sfa.fitWindowing(self.train, windowLength, wordLength, symbols, normMean, True)			
@@ -81,7 +82,7 @@ class MySFA:
 				ftest.write(sfa_str)
 			config += 1
 			#windowLength = 	int(minwl + config*np.sqrt(L-10))
-			windowLength = windowLength + int(np.sqrt(L-10))
+			windowLength = windowLength*2
 		ftrain.close()
 		ftest.close()
 			
@@ -100,12 +101,13 @@ class MySFA:
 	def scoreToFile(self, path):
 		np.savetxt(path, self.acscores, delimiter=",", fmt = "%0.5f")
 
+def run_SFA(dataset, minwl=20, maxwl=None):
+	transformer = MySFA(dataset)
+	transformer.toMultiSFA(f'sfadir/{dataset.lower()}.sfa.train', f'sfadir/{dataset.lower()}.sfa.test', minwl=minwl, maxwl=maxwl)
+ 
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		dataset = sys.argv[1]
 	else:
 		dataset = "Coffee"  # default dataset
-	
-	print(f"Using dataset: {dataset}")
-	transformer = MySFA(dataset)
-	transformer.toMultiSFA(f'sfadir/{dataset.lower()}.sfa.train', f'sfadir/{dataset.lower()}.sfa.test')
+	run_SFA(dataset)

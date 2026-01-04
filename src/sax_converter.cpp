@@ -57,7 +57,7 @@ bool convert_timeseries_to_multi_sax(string input_data,string output_sax,int min
 
 	//convert to sax
 	int config = 0;
-	for (int ws = min_ws; ws < max_ws; ws += sqrt(max_ws)){
+	for (int ws = min_ws; ws < max_ws; ws *= 2){
 		cout << config << " " <<  ws << " " <<  wl << " " <<  as << endl;
 		SAX sax_converter(ws,wl,as,2);
 
