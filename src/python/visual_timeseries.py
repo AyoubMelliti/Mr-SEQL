@@ -34,22 +34,24 @@ def plot_thickness(ts,metats):
 	maxw = max(metats)
 	# normalize the scores
 	if maxw > 0:
-		metats = metats / maxw
-	lwa = np.array([compute_linewidth(x) for x in metats])
-	# maxc = max(metats)
-	# minc = min(metats)
-	colormap = np.array([compute_log_color(x) for x in metats])
-
+		metats_norm = metats / maxw
+	else:
+		metats_norm = metats
+	lwa = np.array([compute_linewidth(x) for x in metats_norm])
+	
+	# Create a color gradient from blue to red
+	def compute_gradient_color(x):
+		# x is normalized between 0 and 1
+		# Blue (0, 0, 1) -> Red (1, 0, 0)
+		return [x, 0, 1 - x]
+	
+	colormap = np.array([compute_gradient_color(x) for x in metats_norm])
 
 	for i in range(0,len(ts)-1):
 		lw = (lwa[i] + lwa[i+1])/2
 		color = (colormap[i]+colormap[i+1])/2
-		# plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=[0.5 + color,0.5 - color,0.5 - abs(color)])
-		# plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=[color*2,0,1 - abs(color)*2])
-		# plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=[max(0,(color - 0.5) * 2),1 - 2*abs(0.5-color),max(0,(0.5 - color)*2)])
-		plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=[color,0,max(0,0.8 - color)])
+		plt.plot([i,i+1],ts[i:(i+2)],linewidth = lw,c=color)
 
-classes = {0: "arabica", 1: "robusta"}
 
 def plot_time_series_with_highlight(ts_file, scores_file, ith):
 
@@ -69,8 +71,8 @@ def plot_time_series_with_highlight(ts_file, scores_file, ith):
 	ts = yts[1:] # remove label
 
 	plot_thickness(ts,metats)
-	plt.title(classes[y] + " - time series #" + str(o+1))
-	return classes[y]
+	plt.title("Class " + str(y) + " - time series #" + str(o+1))
+	return str(y)
 	#plt.show()
 
 
@@ -78,7 +80,8 @@ def plot_time_series_with_highlight(ts_file, scores_file, ith):
 # will plot 2nd and 3rd time series from ts.csv with the highlight determined by score.csv
 # the 2nd time series will be highlighted with postive score from score.csv and the 3rd time series highlighted with negative score
 
-if __name__ == "__main__":
+  
+def visualize(ts_file_name, scores_file_name, indices):
 	if (len(sys.argv) > 3):
 		for ts in sys.argv[3:]:
 			plt.figure(figsize=(20,10))
@@ -87,3 +90,6 @@ if __name__ == "__main__":
 			plt.savefig('figures/ts_highlights-' + str(int(ts)) + '-' + label + '.png', bbox_inches='tight')
 	else:
 		print("Need more input parameters")
+  
+if __name__ == "__main__":
+	visualize(sys.argv[1], sys.argv[2], [int(x) for x in sys.argv[3:]])

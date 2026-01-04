@@ -56,7 +56,7 @@ def train_and_test_from_sources(argvs):
 	# read data
 	train_y = [int(l) for l in open(trainy_source,"r").read().split(' ')]
 	test_y = [int(l) for l in open(testy_source,"r").read().split(' ')]
-
+	print('Trainx source', trainx_sources)
 	train_x = np.concatenate([pd.read_csv(sc, header=None, sep='\\s+') for sc in trainx_sources],axis=1)
 	test_x = np.concatenate([pd.read_csv(sc, header=None, sep='\\s+') for sc in testx_sources],axis=1)
 
